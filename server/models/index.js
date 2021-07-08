@@ -1,0 +1,1 @@
+exports.rbs = require('./rbs.js');
