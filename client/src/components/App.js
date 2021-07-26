@@ -6,7 +6,6 @@ import Column from './Column';
 
 function App() {
   const [rbs, setRbs] = useState([]);
-  console.log('rbs', rbs)
 
   useEffect(() => {
     axios.get('http://localhost:3001/rbs')
@@ -21,9 +20,7 @@ function App() {
     <div className="App">
       <h3>Single list</h3>
       <DragDropContext onDragEnd={onDragEnd}>
-        {rbs.map(rb => {
-          return <Column key={rb.id} rb={rb} />
-        })}
+        <Column players={rbs} title='RBs'/>
       </DragDropContext>
     </div>
   )
