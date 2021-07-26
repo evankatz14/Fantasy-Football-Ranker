@@ -12,8 +12,24 @@ function App() {
       .then(res => setRbs(res.data))
   }, [])
 
-  const onDragEnd = () => {
+  const onDragEnd = result => {
     //TODO: update column order
+    console.log('result', result)
+    const {destination, source, draggableId} = result;
+
+    if (!destination) {
+      return;
+    }
+    if (destination.droppableId === source.droppableId && destination.index === source.index) {
+      return;
+    }
+
+    const newRbs = [...rbs];
+    newRbs.splice(source.index, 1);
+    newRbs.splice(destination.index, 0, rbs[source.index]);
+    console.log(newRbs)
+
+    setRbs(newRbs);
   }
 
   return (

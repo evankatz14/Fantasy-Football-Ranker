@@ -19,7 +19,7 @@ const Player = ({player, index}) => {
         {...provided.dragHandleProps}
         ref={provided.innerRef}
       >
-        {player.name}
+        {index + 1} {player.name}
       </Container>
      )}
    </Draggable>
