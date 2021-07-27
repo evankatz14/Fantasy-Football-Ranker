@@ -10,6 +10,8 @@ const port = 3001;
 
 const app = express();
 
+app.use(bodyParser.json());
+
 app.use(cors({
   origin: 'http://localhost:3000'
 }));

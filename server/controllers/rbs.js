@@ -8,5 +8,14 @@ module.exports = {
     } catch (err) {
       res.send(err);
     }
+  },
+  updateRank: async (req, res) => {
+    try {
+      await models.rbs.updateRbRanks(req.body);
+      res.sendStatus(200);
+    } catch (err) {
+      res.status(500);
+      res.send(err);
+    }
   }
 }
