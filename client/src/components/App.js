@@ -9,12 +9,15 @@ function App() {
 
   useEffect(() => {
     axios.get('http://localhost:3001/rbs')
-      .then(res => setRbs(res.data))
+      .then(res => {
+        const rbsWithRanks = res.data.map((rb, index) => {
+          return {...rb, rank: index + 1}
+        })
+        return setRbs(rbsWithRanks);
+      })
   }, [])
 
   const onDragEnd = result => {
-    //TODO: update column order
-    console.log('result', result)
     const {destination, source, draggableId} = result;
 
     if (!destination) {
@@ -27,9 +30,14 @@ function App() {
     const newRbs = [...rbs];
     newRbs.splice(source.index, 1);
     newRbs.splice(destination.index, 0, rbs[source.index]);
-    console.log(newRbs)
+
+    newRbs.map((rb, index) => rb.rank = (index + 1));
 
     setRbs(newRbs);
+
+    axios.put('http://localhost:3001/rbs', newRbs)
+      .then(() => console.log('successfully updated rbs'))
+      .catch(() => console.log('failed to update rbs'));
   }
 
   return (

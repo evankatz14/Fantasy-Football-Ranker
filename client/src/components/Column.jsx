@@ -26,6 +26,7 @@ const Column = ({players, title}) => {
             ref={provided.innerRef}
           >
             {players.map((player, index) => <Player key={player.id} player={player} index={index} />)}
+            {provided.placeholder}
           </PlayerList>
         )}
       </Droppable>
