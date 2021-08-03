@@ -4,22 +4,17 @@ import styled from 'styled-components';
 import Player from './Player'
 
 const Container = styled.div`
-  margin: 8px;
+  margin: 0 8px 0 8px;
   border: 1px solid lightgrey;
   border-radius: 2px;
   width: 40vw;
   overflow-y: scroll;
-  height: 90vh;
-`;
-const Title = styled.h3`
-  width: 40vw;
-  padding: 8px;
+  height: 77vh;
 `;
 const PlayerList = styled.div`
 `;
-
 const Headers = styled.h4`
-  margin: 8px;
+  margin: 0 8px 0 8px;
   border: 1px solid lightgrey;
   border-radius: 2px;
   width: 40vw;
@@ -28,9 +23,9 @@ const Headers = styled.h4`
 const Column = ({players, title, droppableId}) => {
   return (
     <>
-    <Title>{title}</Title>
-    <Headers style={{marginBottom: '8px', display: 'grid', gridTemplateColumns: '[rank] 1fr [name] 2fr [team] 1fr [age] 1fr [bye] 1fr [adp] 1fr [end]'}}>
+    <Headers style={{display: 'grid', gridTemplateColumns: '[rank] 1fr [photo] 1fr [name] 2fr [team] 1fr [age] 1fr [bye] 1fr [adp] 1fr [end]'}}>
       <div>Rank</div>
+      <div>Photo</div>
       <div>Name</div>
       <div>Team</div>
       <div>Age</div>

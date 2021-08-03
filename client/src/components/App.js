@@ -10,11 +10,25 @@ const Container = styled.div`
   border: 1px solid lightgrey;
   border-radius: 2px;
   height: 75px;
+  position: fixed;
+  top: 87%;
+  width: 95%;
 `;
-const Delete = styled.div``;
+const Delete = styled.div`
+`;
+const Title = styled.div`
+  width: 10vw;
+  padding: 8px 0;
+  border: 1px solid lightgrey;
+  border-radius: 2px;
+`;
 
 function App() {
   const [rbs, setRbs] = useState([]);
+  const [wrs, setWrs] = useState([]);
+  const [qbs, setQbs] = useState([]);
+  const [tes, setTes] = useState([]);
+  const [position, setPosition] = useState('RBs')
 
   useEffect(() => {
     axios.get('http://localhost:3001/rbs')
@@ -38,36 +52,39 @@ function App() {
     }
 
     const newRbs = [...rbs];
-    if (destination.droppableId === 'rbs') {
+    if (destination.droppableId === 'RBs') {
       newRbs.splice(source.index, 1);
       newRbs.splice(destination.index, 0, rbs[source.index]);
 
       newRbs.map((rb, index) => rb.rank = (index + 1));
+      setRbs(newRbs);
     }
 
     if (destination.droppableId === 'remove') {
       newRbs[source.index].rank = null;
+
+      const displayRbs = [...newRbs];
+      displayRbs.splice(source.index, 1);
+      setRbs(displayRbs);
     }
 
     axios.put('http://localhost:3001/rbs', newRbs)
         .then(() => {
           console.log('successfully updated rbs');
-          newRbs.splice(source.index, 1);
-          console.log('newRbs', newRbs)
-
-          setRbs(newRbs);
         })
         .catch(() => console.log('failed to update rbs'));
   }
 
   return (
     <div className="App">
-      <div style={{display: 'flex'}}></div>
+      <div style={{display: 'flex', marginLeft: '8px', width: '40vw'}}>
+        <Title className={position === 'RBs' && "selected"} onClick={() => setPosition('RBs')}>RBs</Title>
+        <Title className={position === 'WRs' && "selected"} onClick={() => setPosition('WRs')}>WRs</Title>
+        <Title className={position === 'QBs' && "selected"} onClick={() => setPosition('QBs')}>QBs</Title>
+        <Title className={position === 'TEs' && "selected"} onClick={() => setPosition('TEs')}>TEs</Title>
+      </div>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Column players={rbs} title='RBs' droppableId={'rbs'}/>
-          <h4 style={{ marginBottom: '5px' }}>
-            Remove Player
-          </h4>
+        <Column players={position === 'RBs' ? rbs : position === 'WRs' ? wrs : position === 'QBs' ? qbs : tes} title='RBs' droppableId={position}/>
         <Container>
           <Droppable droppableId={'remove'}>
             {provided => (
@@ -75,7 +92,7 @@ function App() {
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
-
+                Remove Player
                 {provided.placeholder}
               </Delete>
             )}
