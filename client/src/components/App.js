@@ -1,8 +1,17 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
 import axios from 'axios';
-import { DragDropContext } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import styled from 'styled-components';
 import Column from './Column';
+
+const Container = styled.div`
+  margin: 8px;
+  border: 1px solid lightgrey;
+  border-radius: 2px;
+  height: 75px;
+`;
+const Delete = styled.div``;
 
 function App() {
   const [rbs, setRbs] = useState([]);
@@ -19,6 +28,7 @@ function App() {
 
   const onDragEnd = result => {
     const {destination, source, draggableId} = result;
+    console.log(result)
 
     if (!destination) {
       return;
@@ -28,23 +38,49 @@ function App() {
     }
 
     const newRbs = [...rbs];
-    newRbs.splice(source.index, 1);
-    newRbs.splice(destination.index, 0, rbs[source.index]);
+    if (destination.droppableId === 'rbs') {
+      newRbs.splice(source.index, 1);
+      newRbs.splice(destination.index, 0, rbs[source.index]);
 
-    newRbs.map((rb, index) => rb.rank = (index + 1));
+      newRbs.map((rb, index) => rb.rank = (index + 1));
+    }
 
-    setRbs(newRbs);
+    if (destination.droppableId === 'remove') {
+      newRbs[source.index].rank = null;
+    }
 
     axios.put('http://localhost:3001/rbs', newRbs)
-      .then(() => console.log('successfully updated rbs'))
-      .catch(() => console.log('failed to update rbs'));
+        .then(() => {
+          console.log('successfully updated rbs');
+          newRbs.splice(source.index, 1);
+          console.log('newRbs', newRbs)
+
+          setRbs(newRbs);
+        })
+        .catch(() => console.log('failed to update rbs'));
   }
 
   return (
     <div className="App">
-      <h3>Single list</h3>
+      <div style={{display: 'flex'}}></div>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Column players={rbs} title='RBs'/>
+        <Column players={rbs} title='RBs' droppableId={'rbs'}/>
+          <h4 style={{ marginBottom: '5px' }}>
+            Remove Player
+          </h4>
+        <Container>
+          <Droppable droppableId={'remove'}>
+            {provided => (
+              <Delete
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+              >
+
+                {provided.placeholder}
+              </Delete>
+            )}
+          </Droppable>
+        </Container>
       </DragDropContext>
     </div>
   )
