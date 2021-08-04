@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
 import axios from 'axios';
+import _ from 'underscore';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import Column from './Column';
@@ -34,11 +35,27 @@ function App() {
     axios.get('http://localhost:3001/rbs')
       .then(res => {
         const rbsWithRanks = res.data.map((rb, index) => {
-          return {...rb, position_rank: index + 1}
+          return {...rb, position_rank: index + 1};
         })
-        return setRbs(rbsWithRanks);
+        setRbs(rbsWithRanks);
       })
   }, []);
+
+  const memoizeGetWrs = _.memoize(() => {
+    axios.get('http://localhost:3001/wrs')
+      .then(res => {
+        const wrsWithRanks = res.data.map((wr, index) => {
+          return {...wr, position_rank: index + 1};
+        })
+        setWrs(wrsWithRanks);
+      })
+      .catch(err => console.log(err));
+  })
+
+  const handleChangeTab = () => {
+      memoizeGetWrs()
+      setPosition('WRs');
+    }
 
   const onDragEnd = result => {
     const {destination, source} = result;
@@ -79,12 +96,12 @@ function App() {
     <div className="App">
       <div style={{display: 'flex', marginLeft: '8px', width: '40vw'}}>
         <Title className={position === 'RBs' && "selected"} onClick={() => setPosition('RBs')}>RBs</Title>
-        <Title className={position === 'WRs' && "selected"} onClick={() => setPosition('WRs')}>WRs</Title>
+        <Title className={position === 'WRs' && "selected"} onClick={handleChangeTab}>WRs</Title>
         <Title className={position === 'QBs' && "selected"} onClick={() => setPosition('QBs')}>QBs</Title>
         <Title className={position === 'TEs' && "selected"} onClick={() => setPosition('TEs')}>TEs</Title>
       </div>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Column players={position === 'RBs' ? rbs : position === 'WRs' ? wrs : position === 'QBs' ? qbs : tes} title='RBs' droppableId={position}/>
+        <Column players={position === 'RBs' ? rbs : position === 'WRs' ? wrs : position === 'QBs' ? qbs : tes} droppableId={position}/>
         <Container>
           <Droppable droppableId={'remove'}>
             {provided => (

@@ -20,7 +20,7 @@ const Headers = styled.h4`
   width: 40vw;
 `;
 
-const Column = ({players, title, droppableId}) => {
+const Column = ({players, droppableId}) => {
   return (
     <>
     <Headers style={{display: 'grid', gridTemplateColumns: '[rank] 1fr [photo] 1fr [name] 2fr [team] 1fr [age] 1fr [bye] 1fr [adp] 1fr [end]'}}>
