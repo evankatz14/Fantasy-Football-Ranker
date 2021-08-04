@@ -1,18 +1,18 @@
 const models = require('../models');
 
 module.exports = {
-  getRbs: async (req, res) => {
+  getWrs: async (req, res) => {
     try {
-      const results = await models.rbs.getRbs();
-      res.json(results);
+      const result = await models.wrs.getWrs();
+      res.json(result);
     } catch (err) {
       res.status(400);
       res.send(err);
     }
   },
-  updateRbRanks: async (req, res) => {
+  updateWrRanks: async (req, res) => {
     try {
-      await models.rbs.updateRbRanks(req.body);
+      const result = await models.wrs.updateWrRanks(req.body);
       res.sendStatus(200);
     } catch (err) {
       res.status(400);

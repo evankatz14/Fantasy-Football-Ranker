@@ -34,14 +34,14 @@ function App() {
     axios.get('http://localhost:3001/rbs')
       .then(res => {
         const rbsWithRanks = res.data.map((rb, index) => {
-          return {...rb, rank: index + 1}
+          return {...rb, position_rank: index + 1}
         })
         return setRbs(rbsWithRanks);
       })
-  }, [])
+  }, []);
 
   const onDragEnd = result => {
-    const {destination, source, draggableId} = result;
+    const {destination, source} = result;
     console.log(result)
 
     if (!destination) {
@@ -56,12 +56,12 @@ function App() {
       newRbs.splice(source.index, 1);
       newRbs.splice(destination.index, 0, rbs[source.index]);
 
-      newRbs.map((rb, index) => rb.rank = (index + 1));
+      newRbs.map((rb, index) => rb.position_rank = (index + 1));
       setRbs(newRbs);
     }
 
     if (destination.droppableId === 'remove') {
-      newRbs[source.index].rank = null;
+      newRbs[source.index].position_rank = null;
 
       const displayRbs = [...newRbs];
       displayRbs.splice(source.index, 1);

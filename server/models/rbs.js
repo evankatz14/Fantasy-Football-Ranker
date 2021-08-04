@@ -1,9 +1,9 @@
 const { db } = require('../postgres');
 
 module.exports = {
-  getAllRbs: async () => {
+  getRbs: async () => {
     try {
-      return await db.any('SELECT * FROM rbs ORDER BY rank LIMIT 100');
+      return await db.any('SELECT * FROM all_players WHERE position = $1 ORDER BY position_rank LIMIT 100', ['RB']);
     } catch (err) {
       return err;
     }
@@ -11,7 +11,7 @@ module.exports = {
   updateRbRanks: async (rbs) => {
     try {
       return rbs.map(async (rb) => {
-        return await db.none('UPDATE rbs SET rank = $1 WHERE id = $2', [rb.rank, rb.id]);
+        return await db.none('UPDATE all_players SET position_rank = $1 WHERE id = $2', [rb.position_rank, rb.id]);
       })
     } catch (err) {
       return err;
