@@ -11,7 +11,7 @@ module.exports = {
   updateWrRanks: async (wrs) => {
     try {
       return wrs.map(async (wr) => {
-        return await db.none('UPDATE all_players SET player_rank = $1 WHERE id = $2', [wr.player_rank, wr.id])
+        return await db.none('UPDATE all_players SET position_rank = $1 WHERE id = $2', [wr.position_rank, wr.id])
       })
     } catch (err) {
       return err;
