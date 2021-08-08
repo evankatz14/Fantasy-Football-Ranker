@@ -3,7 +3,7 @@ const { db } = require('../postgres');
 module.exports = {
   getWrs: async () => {
     try {
-      return await db.any('SELECT * FROM all_players WHERE position = $1 ORDER BY position_rank LIMIT 100', ['WR']);
+      return await db.any('SELECT * FROM all_players WHERE position = $1 ORDER BY position_rank LIMIT 75', ['WR']);
     } catch (err) {
       return err;
     }

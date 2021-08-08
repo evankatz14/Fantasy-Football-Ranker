@@ -31,6 +31,10 @@ function App() {
   const [tes, setTes] = useState([]);
   const [position, setPosition] = useState('rbs')
 
+  const setPositionPlayers = (players, curPos) => {
+    curPos === 'rbs' ? setRbs(players) : curPos === 'wrs' ? setWrs(players) : curPos === 'qbs' ? setQbs(players) : setTes(players);
+  }
+
   useEffect(() => {
     axios.get('http://localhost:3001/rbs')
       .then(res => {
@@ -41,55 +45,62 @@ function App() {
       })
   }, []);
 
-  const memoizeGetWrs = _.memoize(() => {
-    axios.get('http://localhost:3001/wrs')
-      .then(res => {
-        const wrsWithRanks = res.data.map((wr, index) => {
-          return {...wr, position_rank: index + 1};
-        })
-        setWrs(wrsWithRanks);
-      })
-      .catch(err => console.log(err));
-  })
+  const promiseMemoize = (fn) => {
+    let cache = {}
+    return (...args) => {
+      let strX = JSON.stringify(args);
+      return strX in cache ? cache[strX]
+        : (cache[strX] = fn(...args).catch((x) => {
+            delete cache[strX];
+            return x;
+          }))
+    }
+  }
 
-  const handleChangeTab = () => {
-      memoizeGetWrs()
-      setPosition('wrs');
+  const originalMakeCall = (url, options) => {
+    return axios.get(url, options);
+  }
+
+  const makeCall = promiseMemoize(originalMakeCall);
+
+  const handleChangeTab = async (curPos) => {
+      const {data} = await makeCall(`http://localhost:3001/${curPos}`);
+      const playersWithRanks = data.map((player, index) => {
+        return {...player, position_rank: index + 1};
+      })
+      setPositionPlayers(playersWithRanks, curPos);
+      setPosition(curPos);
     }
 
   const onDragEnd = result => {
     const {destination, source} = result;
-    console.log(result)
+    const newPlayers = source.droppableId === 'rbs' ? [...rbs] : source.droppableId === 'wrs' ? [...wrs] : source.droppableId === 'qbs' ? [...qbs] : [...tes];
+    const displayPlayers = newPlayers.slice();
 
     if (!destination) {
-      return;
+      newPlayers[source.index].position_rank = null;
+
+      displayPlayers.splice(source.index, 1);
+      setPositionPlayers(displayPlayers, source.droppableId);
+    } else {
+      if (destination && destination.droppableId === source.droppableId && destination.index === source.index) {
+        return;
+      }
+
+      if (destination.droppableId === 'remove') {
+        newPlayers[source.index].position_rank = null;
+
+        displayPlayers.splice(source.index, 1);
+        setPositionPlayers(displayPlayers, source.droppableId);
+      } else {
+        let temp = newPlayers[source.index];
+        newPlayers.splice(source.index, 1);
+        newPlayers.splice(destination.index, 0, temp);
+
+        newPlayers.map((player, index) => player.position_rank = (index + 1));
+        setPositionPlayers(newPlayers, source.droppableId);
+      }
     }
-    if (destination.droppableId === source.droppableId && destination.index === source.index) {
-      return;
-    }
-
-    // const newRbs = [...rbs];
-    const newPlayers = source.droppableId === 'rbs' ? [...rbs] : source.droppableId === 'wrs' ? [...wrs] : [];
-    // if (destination.droppableId === 'RBs') {
-      // newRbs.splice(source.index, 1);
-      // newRbs.splice(destination.index, 0, rbs[source.index]);
-      let temp = newPlayers[source.index];
-      newPlayers.splice(source.index, 1);
-      newPlayers.splice(destination.index, 0, temp);
-
-      // newRbs.map((rb, index) => rb.position_rank = (index + 1));
-      newPlayers.map((player, index) => player.position_rank = (index + 1));
-      // setRbs(newRbs);
-      source.droppableId === 'rbs' ? setRbs(newPlayers) : setWrs(newPlayers);
-    // }
-
-    // if (destination.droppableId === 'remove') {
-    //   newRbs[source.index].position_rank = null;
-
-    //   const displayRbs = [...newRbs];
-    //   displayRbs.splice(source.index, 1);
-    //   setRbs(displayRbs);
-    // }
 
     axios.put(`http://localhost:3001/${position}`, newPlayers)
         .then(() => {
@@ -102,9 +113,9 @@ function App() {
     <div className="App">
       <div style={{display: 'flex', marginLeft: '8px', width: '40vw'}}>
         <Title className={position === 'rbs' && "selected"} onClick={() => setPosition('rbs')}>RBs</Title>
-        <Title className={position === 'wrs' && "selected"} onClick={handleChangeTab}>WRs</Title>
-        <Title className={position === 'qbs' && "selected"} onClick={() => setPosition('qbs')}>QBs</Title>
-        <Title className={position === 'tes' && "selected"} onClick={() => setPosition('tes')}>TEs</Title>
+        <Title className={position === 'wrs' && "selected"} onClick={() => handleChangeTab('wrs')}>WRs</Title>
+        <Title className={position === 'qbs' && "selected"} onClick={() => handleChangeTab('qbs')}>QBs</Title>
+        <Title className={position === 'tes' && "selected"} onClick={() => handleChangeTab('tes')}>TEs</Title>
       </div>
       <DragDropContext onDragEnd={onDragEnd}>
         <Column players={position === 'rbs' ? rbs : position === 'wrs' ? wrs : position === 'qbs' ? qbs : tes} droppableId={position}/>
