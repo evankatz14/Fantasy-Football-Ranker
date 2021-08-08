@@ -51,6 +51,7 @@ function App() {
           return {...player, overall_rank: index + 1};
         })
         setTop200(allWithRanks);
+        axios.put('http://localhost:3001/all', top200);
       })
   }, []);
 
@@ -81,23 +82,29 @@ function App() {
       setPosition(curPos);
     }
 
-  const onDragEnd = result => {
+  const onDragEnd = async (result) => {
     console.log(result)
     const {destination, source} = result;
     const newPlayers = source.droppableId === 'rbs' ? [...rbs] : source.droppableId === 'wrs' ? [...wrs] : source.droppableId === 'qbs' ? [...qbs] : source.droppableId === 'tes' ? [...tes] : [...top200];
     const displayPlayers = newPlayers.slice();
     let url = source.droppableId === 'top200' ? 'http://localhost:3001/all' : `http://localhost:3001/${position}`;
 
-    if (!destination && source.droppableId !== 'top200') {
-      const newTop200 = [...top200];
-      newTop200.splice((newPlayers[source.index].overall_rank - 1), 1);
-      setTop200(newTop200);
+    if (!destination) {
+      if (source.droppableId !== 'top200') {
+        const newTop200 = [...top200];
+        newTop200[newPlayers[source.index].overall_rank - 1].overall_rank = null;
 
-      newPlayers[source.index].position_rank = null;
-      newPlayers[source.index].overall_rank = null;
+        await axios.put('http://localhost:3001/all', newTop200);
 
-      displayPlayers.splice(source.index, 1);
-      setPositionPlayers(displayPlayers, source.droppableId);
+        newTop200.splice((newPlayers[source.index].overall_rank - 1), 1);
+        setTop200(newTop200);
+
+        newPlayers[source.index].position_rank = null;
+        newPlayers[source.index].overall_rank = null;
+
+        displayPlayers.splice(source.index, 1);
+        setPositionPlayers(displayPlayers, source.droppableId);
+      }
     } else {
       if (destination && destination.droppableId === source.droppableId && destination.index === source.index) {
         return;

@@ -27,8 +27,9 @@ const Player = ({player, index, droppableId}) => {
       >
         {droppableId === 'top200'
           ? (
-            <div style={{display: 'grid', gridTemplateColumns: '[rank] 1fr [name] 2fr [team] 1fr [age] 1fr [bye] 1fr [adp] 1fr [end]'}}>
+            <div style={{display: 'grid', gridTemplateColumns: '[rank] 1fr [pos] 1fr [name] 3fr [team] 2fr [age] 1fr [bye] 1fr [adp] 1fr [end]'}}>
               <Row>{index + 1}</Row>
+              <Row>{player.position}</Row>
               <Row>{player.name}</Row>
               <Row>{player.team}</Row>
               <Row>{player.age}</Row>
@@ -36,9 +37,9 @@ const Player = ({player, index, droppableId}) => {
               <Row>{player.adp}</Row>
             </div>
           ) : (
-            <div style={{display: 'grid', gridTemplateColumns: '[rank] 1fr [photo] 1fr [name] 2fr [team] 1fr [age] 1fr [bye] 1fr [adp] 1fr [end]'}}>
+            <div style={{display: 'grid', gridTemplateColumns: '[rank] 1fr [photo] 2fr [name] 3fr [team] 2fr [age] 1fr [bye] 1fr [adp] 1fr [end]'}}>
               <Row>{index + 1}</Row>
-              <img style={{width: '50px', height: 'auto'}} src={player.photo_url} alt="headshot" />
+              <img style={{width: '50px', height: 'auto', marginLeft: 'auto', marginRight: 'auto'}} src={player.photo_url} alt="headshot" />
               <Row>{player.name}</Row>
               <Row>{player.team}</Row>
               <Row>{player.age}</Row>
