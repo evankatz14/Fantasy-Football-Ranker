@@ -15,8 +15,8 @@ const Container = styled.div`
   top: 87%;
   width: 95%;
 `;
-const Delete = styled.div`
-`;
+// const Delete = styled.div`
+// `;
 const Title = styled.div`
   width: 10vw;
   padding: 8px 0;
@@ -29,11 +29,11 @@ function App() {
   const [wrs, setWrs] = useState([]);
   const [qbs, setQbs] = useState([]);
   const [tes, setTes] = useState([]);
-  const [position, setPosition] = useState('rbs')
+  const [position, setPosition] = useState('rbs');
   const [top200, setTop200] = useState([]);
 
   const setPositionPlayers = (players, curPos) => {
-    curPos === 'rbs' ? setRbs(players) : curPos === 'wrs' ? setWrs(players) : curPos === 'qbs' ? setQbs(players) : setTes(players);
+    curPos === 'rbs' ? setRbs(players) : curPos === 'wrs' ? setWrs(players) : curPos === 'qbs' ? setQbs(players) : curPos === 'tes' ? setTes(players) : setTop200(players);
   }
 
   useEffect(() => {
@@ -82,12 +82,19 @@ function App() {
     }
 
   const onDragEnd = result => {
+    console.log(result)
     const {destination, source} = result;
-    const newPlayers = source.droppableId === 'rbs' ? [...rbs] : source.droppableId === 'wrs' ? [...wrs] : source.droppableId === 'qbs' ? [...qbs] : [...tes];
+    const newPlayers = source.droppableId === 'rbs' ? [...rbs] : source.droppableId === 'wrs' ? [...wrs] : source.droppableId === 'qbs' ? [...qbs] : source.droppableId === 'tes' ? [...tes] : [...top200];
     const displayPlayers = newPlayers.slice();
+    let url = source.droppableId === 'top200' ? 'http://localhost:3001/all' : `http://localhost:3001/${position}`;
 
-    if (!destination) {
+    if (!destination && source.droppableId !== 'top200') {
+      const newTop200 = [...top200];
+      newTop200.splice((newPlayers[source.index].overall_rank - 1), 1);
+      setTop200(newTop200);
+
       newPlayers[source.index].position_rank = null;
+      newPlayers[source.index].overall_rank = null;
 
       displayPlayers.splice(source.index, 1);
       setPositionPlayers(displayPlayers, source.droppableId);
@@ -95,23 +102,23 @@ function App() {
       if (destination && destination.droppableId === source.droppableId && destination.index === source.index) {
         return;
       }
+      // if (destination.droppableId === 'remove') {
+      //   newPlayers[source.index].position_rank = null;
 
-      if (destination.droppableId === 'remove') {
-        newPlayers[source.index].position_rank = null;
-
-        displayPlayers.splice(source.index, 1);
-        setPositionPlayers(displayPlayers, source.droppableId);
-      } else {
+      //   displayPlayers.splice(source.index, 1);
+      //   setPositionPlayers(displayPlayers, source.droppableId);
+      // } else
+      {
         let temp = newPlayers[source.index];
         newPlayers.splice(source.index, 1);
         newPlayers.splice(destination.index, 0, temp);
 
-        newPlayers.map((player, index) => player.position_rank = (index + 1));
+        newPlayers.map((player, index) => source.droppableId === 'top200' ? player.overall_rank = (index + 1): player.position_rank = (index + 1));
         setPositionPlayers(newPlayers, source.droppableId);
       }
     }
 
-    axios.put(`http://localhost:3001/${position}`, newPlayers)
+    axios.put(url, newPlayers)
         .then(() => {
           console.log('successfully updated players');
         })
@@ -129,7 +136,7 @@ function App() {
         </div>
         <DragDropContext onDragEnd={onDragEnd}>
           <Column players={position === 'rbs' ? rbs : position === 'wrs' ? wrs : position === 'qbs' ? qbs : tes} droppableId={position}/>
-          <Container>
+          {/* <Container>
             <Droppable droppableId={'remove'}>
               {provided => (
                 <Delete
@@ -141,7 +148,7 @@ function App() {
                 </Delete>
               )}
             </Droppable>
-          </Container>
+          </Container> */}
         </DragDropContext>
       </div>
       <div style={{display: 'flex', flexDirection: 'column'}}>

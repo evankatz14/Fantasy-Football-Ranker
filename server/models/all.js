@@ -7,5 +7,14 @@ module.exports = {
     } catch (err) {
       return err;
     }
+  },
+  updateOverallRanks: (top200) => {
+    try {
+      return top200.map(async (player) => {
+        return await db.none('Update all_players SET overall_rank = $1 WHERE id = $2', [player.overall_rank, player.id])
+      })
+    } catch (err) {
+      return err;
+    }
   }
 }

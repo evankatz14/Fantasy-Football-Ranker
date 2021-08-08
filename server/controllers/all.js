@@ -9,5 +9,14 @@ module.exports = {
       res.status(400);
       res.send(err);
     }
+  },
+  updateOverallRanks: async (req, res) => {
+    try {
+      await models.all.updateOverallRanks(req.body);
+      res.sendStatus(200);
+    } catch (err) {
+      res.status(400);
+      res.send(err);
+    }
   }
 }

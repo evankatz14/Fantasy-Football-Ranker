@@ -9,7 +9,7 @@ const Container = styled.div`
   border-radius: 2px;
   width: 40vw;
   overflow-y: scroll;
-  height: 77vh;
+  height: 85vh;
 `;
 const PlayerList = styled.div`
 `;
