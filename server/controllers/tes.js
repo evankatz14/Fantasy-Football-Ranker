@@ -1,18 +1,18 @@
 const models = require('../models');
 
 module.exports = {
-  getQbs: async (req, res) => {
+  getTes: async (req, res) => {
     try {
-      const results = await models.qbs.getQbs();
+      const results = await models.tes.getTes();
       res.json(results);
     } catch (err) {
       res.status(400);
       res.send(err);
     }
   },
-  updateQbRanks: async (req, res) => {
+  updateTeRanks: async (req, res) => {
     try {
-      await models.qbs.updateQbRanks(req.body);
+      await models.tes.updateTeRanks(req.body);
       res.sendStatus(200);
     } catch (err) {
       res.status(400);
