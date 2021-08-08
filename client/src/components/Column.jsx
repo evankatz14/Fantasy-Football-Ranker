@@ -22,30 +22,43 @@ const Headers = styled.h4`
 
 const Column = ({players, droppableId}) => {
   return (
-    <>
-    <Headers style={{display: 'grid', gridTemplateColumns: '[rank] 1fr [photo] 1fr [name] 2fr [team] 1fr [age] 1fr [bye] 1fr [adp] 1fr [end]'}}>
-      <div>Rank</div>
-      <div>Photo</div>
-      <div>Name</div>
-      <div>Team</div>
-      <div>Age</div>
-      <div>Bye</div>
-      <div>ADP</div>
-    </Headers>
-    <Container>
-      <Droppable droppableId={droppableId}>
-        {provided => (
-          <PlayerList
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-          >
-            {players.map((player, index) => <Player key={player.id} player={player} index={index} />)}
-            {provided.placeholder}
-          </PlayerList>
-        )}
-      </Droppable>
-    </Container>
-    </>
+    <div style={{display: 'flex', flexDirection: 'column'}}>
+      {droppableId === 'top200'
+      ? (
+        <Headers style={{display: 'grid', gridTemplateColumns: '[rank] 1fr [name] 2fr [team] 1fr [age] 1fr [bye] 1fr [adp] 1fr [end]'}}>
+          <div>Rank</div>
+          <div>Name</div>
+          <div>Team</div>
+          <div>Age</div>
+          <div>Bye</div>
+          <div>ADP</div>
+        </Headers>
+      ) : (
+        <Headers style={{display: 'grid', gridTemplateColumns: '[rank] 1fr [photo] 1fr [name] 2fr [team] 1fr [age] 1fr [bye] 1fr [adp] 1fr [end]'}}>
+          <div>Rank</div>
+          <div>Photo</div>
+          <div>Name</div>
+          <div>Team</div>
+          <div>Age</div>
+          <div>Bye</div>
+          <div>ADP</div>
+        </Headers>
+      )}
+      <Container>
+        <Droppable droppableId={droppableId}>
+          {provided => (
+            <PlayerList
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {players.map((player, index) =>
+                <Player key={player.id} player={player} index={index} droppableId={droppableId}/>)}
+              {provided.placeholder}
+            </PlayerList>
+          )}
+        </Droppable>
+      </Container>
+    </div>
   )
 }
 

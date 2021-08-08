@@ -1,6 +1,8 @@
 const controller = require('./controllers');
 const router = require('express').Router();
 
+router.get('/all', controller.all.getTop200);
+
 router.get('/rbs', controller.rbs.getRbs);
 router.get('/wrs', controller.wrs.getWrs);
 router.get('/qbs', controller.qbs.getQbs);

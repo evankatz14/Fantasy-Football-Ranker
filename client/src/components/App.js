@@ -30,6 +30,7 @@ function App() {
   const [qbs, setQbs] = useState([]);
   const [tes, setTes] = useState([]);
   const [position, setPosition] = useState('rbs')
+  const [top200, setTop200] = useState([]);
 
   const setPositionPlayers = (players, curPos) => {
     curPos === 'rbs' ? setRbs(players) : curPos === 'wrs' ? setWrs(players) : curPos === 'qbs' ? setQbs(players) : setTes(players);
@@ -42,6 +43,14 @@ function App() {
           return {...rb, position_rank: index + 1};
         })
         setRbs(rbsWithRanks);
+      })
+
+    axios.get('http://localhost:3001/all')
+      .then(res => {
+        const allWithRanks = res.data.map((player, index) => {
+          return {...player, overall_rank: index + 1};
+        })
+        setTop200(allWithRanks);
       })
   }, []);
 
@@ -111,28 +120,36 @@ function App() {
 
   return (
     <div className="App">
-      <div style={{display: 'flex', marginLeft: '8px', width: '40vw'}}>
-        <Title className={position === 'rbs' && "selected"} onClick={() => setPosition('rbs')}>RBs</Title>
-        <Title className={position === 'wrs' && "selected"} onClick={() => handleChangeTab('wrs')}>WRs</Title>
-        <Title className={position === 'qbs' && "selected"} onClick={() => handleChangeTab('qbs')}>QBs</Title>
-        <Title className={position === 'tes' && "selected"} onClick={() => handleChangeTab('tes')}>TEs</Title>
+      <div style={{display: 'flex', flexDirection: 'column'}}>
+        <div style={{display: 'flex', marginLeft: '8px', width: '40vw'}}>
+          <Title className={position === 'rbs' && "selected"} onClick={() => setPosition('rbs')}>RBs</Title>
+          <Title className={position === 'wrs' && "selected"} onClick={() => handleChangeTab('wrs')}>WRs</Title>
+          <Title className={position === 'qbs' && "selected"} onClick={() => handleChangeTab('qbs')}>QBs</Title>
+          <Title className={position === 'tes' && "selected"} onClick={() => handleChangeTab('tes')}>TEs</Title>
+        </div>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Column players={position === 'rbs' ? rbs : position === 'wrs' ? wrs : position === 'qbs' ? qbs : tes} droppableId={position}/>
+          <Container>
+            <Droppable droppableId={'remove'}>
+              {provided => (
+                <Delete
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                >
+                  Remove Player
+                  {provided.placeholder}
+                </Delete>
+              )}
+            </Droppable>
+          </Container>
+        </DragDropContext>
       </div>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Column players={position === 'rbs' ? rbs : position === 'wrs' ? wrs : position === 'qbs' ? qbs : tes} droppableId={position}/>
-        <Container>
-          <Droppable droppableId={'remove'}>
-            {provided => (
-              <Delete
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-              >
-                Remove Player
-                {provided.placeholder}
-              </Delete>
-            )}
-          </Droppable>
-        </Container>
-      </DragDropContext>
+      <div style={{display: 'flex', flexDirection: 'column'}}>
+        <h4 style={{margin: '9px'}}>The Top 200</h4>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Column players={top200} droppableId={'top200'}/>
+        </DragDropContext>
+      </div>
     </div>
   )
 }
