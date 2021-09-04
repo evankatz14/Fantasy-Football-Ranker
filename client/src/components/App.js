@@ -111,7 +111,14 @@ function App() {
       newPlayers.splice(source.index, 1);
       newPlayers.splice(destination.index, 0, temp);
 
-      newPlayers.map((player, index) => source.droppableId === 'top200' ? player.overall_rank = (index + 1) : player.position_rank = (index + 1));
+      newPlayers.map((player, index) => {
+        if (source.droppableId === 'top200') {
+          player.overall_rank = (index + 1);
+          player.diff = player.yahoo_rank - player.overall_rank;
+        } else {
+          player.position_rank = (index + 1);
+        }
+      });
       setPositionPlayers(newPlayers, source.droppableId);
     }
 
