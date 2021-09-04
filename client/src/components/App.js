@@ -32,10 +32,6 @@ function App() {
   const [position, setPosition] = useState('rbs');
   const [top200, setTop200] = useState([]);
 
-  const setPositionPlayers = (players, curPos) => {
-    curPos === 'rbs' ? setRbs(players) : curPos === 'wrs' ? setWrs(players) : curPos === 'qbs' ? setQbs(players) : curPos === 'tes' ? setTes(players) : setTop200(players);
-  }
-
   useEffect(() => {
     axios.get('http://localhost:3001/rbs')
       .then(res => {
@@ -54,6 +50,10 @@ function App() {
         axios.put('http://localhost:3001/all', top200);
       })
   }, []);
+
+  const setPositionPlayers = (players, curPos) => {
+    curPos === 'rbs' ? setRbs(players) : curPos === 'wrs' ? setWrs(players) : curPos === 'qbs' ? setQbs(players) : curPos === 'tes' ? setTes(players) : setTop200(players);
+  }
 
   const promiseMemoize = (fn) => {
     let cache = {}
@@ -90,21 +90,21 @@ function App() {
     let url = source.droppableId === 'top200' ? 'http://localhost:3001/all' : `http://localhost:3001/${position}`;
 
     if (!destination) {
-      if (source.droppableId !== 'top200') {
-        const newTop200 = [...top200];
-        newTop200[newPlayers[source.index].overall_rank - 1].overall_rank = null;
+      // if (source.droppableId === 'top200') {
+        // const newTop200 = [...top200];
+        // newTop200[newPlayers[source.index].overall_rank - 1].overall_rank = null;
 
-        await axios.put('http://localhost:3001/all', newTop200);
+        // await axios.put('http://localhost:3001/all', newTop200);
 
-        newTop200.splice((newPlayers[source.index].overall_rank - 1), 1);
-        setTop200(newTop200);
+        // newTop200.splice((newPlayers[source.index].overall_rank - 1), 1);
+        // setTop200(newTop200);
 
         newPlayers[source.index].position_rank = null;
         newPlayers[source.index].overall_rank = null;
 
         displayPlayers.splice(source.index, 1);
         setPositionPlayers(displayPlayers, source.droppableId);
-      }
+      // }
     } else {
       if (destination && destination.droppableId === source.droppableId && destination.index === source.index) {
         return;
@@ -115,14 +115,12 @@ function App() {
       //   displayPlayers.splice(source.index, 1);
       //   setPositionPlayers(displayPlayers, source.droppableId);
       // } else
-      {
-        let temp = newPlayers[source.index];
-        newPlayers.splice(source.index, 1);
-        newPlayers.splice(destination.index, 0, temp);
+      let temp = newPlayers[source.index];
+      newPlayers.splice(source.index, 1);
+      newPlayers.splice(destination.index, 0, temp);
 
-        newPlayers.map((player, index) => source.droppableId === 'top200' ? player.overall_rank = (index + 1): player.position_rank = (index + 1));
-        setPositionPlayers(newPlayers, source.droppableId);
-      }
+      newPlayers.map((player, index) => source.droppableId === 'top200' ? player.overall_rank = (index + 1) : player.position_rank = (index + 1));
+      setPositionPlayers(newPlayers, source.droppableId);
     }
 
     axios.put(url, newPlayers)
@@ -136,7 +134,7 @@ function App() {
     <div className="App">
       <div style={{display: 'flex', flexDirection: 'column'}}>
         <div style={{display: 'flex', marginLeft: '8px', width: '40vw'}}>
-          <Title className={position === 'rbs' && "selected"} onClick={() => setPosition('rbs')}>RBs</Title>
+          <Title className={position === 'rbs' && "selected"} onClick={() => handleChangeTab('rbs')}>RBs</Title>
           <Title className={position === 'wrs' && "selected"} onClick={() => handleChangeTab('wrs')}>WRs</Title>
           <Title className={position === 'qbs' && "selected"} onClick={() => handleChangeTab('qbs')}>QBs</Title>
           <Title className={position === 'tes' && "selected"} onClick={() => handleChangeTab('tes')}>TEs</Title>

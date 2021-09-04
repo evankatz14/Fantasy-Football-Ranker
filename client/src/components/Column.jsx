@@ -25,14 +25,14 @@ const Column = ({players, droppableId}) => {
     <div style={{display: 'flex', flexDirection: 'column'}}>
       {droppableId === 'top200'
       ? (
-        <Headers style={{display: 'grid', gridTemplateColumns: '[rank] 1fr [pos] 1fr [name] 3fr [team] 2fr [age] 1fr [bye] 1fr [adp] 1fr [end]'}}>
+        <Headers style={{display: 'grid', gridTemplateColumns: '[rank] 1fr [pos] 1fr [name] 3fr [team] 2fr [bye] 1fr [adp] 1fr [diff] 1fr [end]'}}>
           <div>Rank</div>
           <div>Pos</div>
           <div>Name</div>
           <div>Team</div>
-          <div>Age</div>
           <div>Bye</div>
           <div>ADP</div>
+          <div>Diff</div>
         </Headers>
       ) : (
         <Headers style={{display: 'grid', gridTemplateColumns: '[rank] 1fr [photo] 2fr [name] 3fr [team] 2fr [age] 1fr [bye] 1fr [adp] 1fr [end]'}}>
