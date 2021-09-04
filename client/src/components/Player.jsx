@@ -15,8 +15,14 @@ const Row = styled.div`
   align-items: center;
 `;
 
-const Player = ({player, index, droppableId}) => {
-  const color = (index + 1) % 24 === 7 || (index + 1) % 24 === 18 ? 'blue' : 'white'
+const isUserPick = (pick, index) => {
+  const inverse = 24 - (pick - 1);
+  return (index + 1) % 24 === pick || (index + 1) % 24 === inverse % 24 ? 'blue' : 'white';
+}
+
+const Player = ({player, index, droppableId, pick}) => {
+  // const color = (index + 1) % 24 === 7 || (index + 1) % 24 === 18 ? 'blue' : 'white';
+  const color = isUserPick(pick, index);
   const {position, name, team, bye_week, yahoo_rank, diff, age, photo_url} = player;
   return (
     <div>

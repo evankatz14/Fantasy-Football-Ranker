@@ -31,6 +31,8 @@ function App() {
   const [tes, setTes] = useState([]);
   const [position, setPosition] = useState('rbs');
   const [top200, setTop200] = useState([]);
+  const [pick, setPick] = useState(1);
+
 
   useEffect(() => {
     axios.get('http://localhost:3001/rbs')
@@ -90,21 +92,11 @@ function App() {
     let url = source.droppableId === 'top200' ? 'http://localhost:3001/all' : `http://localhost:3001/${position}`;
 
     if (!destination) {
-      // if (source.droppableId === 'top200') {
-        // const newTop200 = [...top200];
-        // newTop200[newPlayers[source.index].overall_rank - 1].overall_rank = null;
+      newPlayers[source.index].position_rank = null;
+      newPlayers[source.index].overall_rank = null;
 
-        // await axios.put('http://localhost:3001/all', newTop200);
-
-        // newTop200.splice((newPlayers[source.index].overall_rank - 1), 1);
-        // setTop200(newTop200);
-
-        newPlayers[source.index].position_rank = null;
-        newPlayers[source.index].overall_rank = null;
-
-        displayPlayers.splice(source.index, 1);
-        setPositionPlayers(displayPlayers, source.droppableId);
-      // }
+      displayPlayers.splice(source.index, 1);
+      setPositionPlayers(displayPlayers, source.droppableId);
     } else {
       if (destination && destination.droppableId === source.droppableId && destination.index === source.index) {
         return;
@@ -157,9 +149,25 @@ function App() {
         </DragDropContext>
       </div>
       <div style={{display: 'flex', flexDirection: 'column'}}>
-        <h4 style={{margin: '9px'}}>The Top 200</h4>
+        <div style={{display: 'flex', justifyContent: 'center'}}>
+          <select id="dropdown" value={pick} onChange={(e) => setPick(Number(e.target.value))}>
+            <option value={1}>1</option>
+            <option value={2}>2</option>
+            <option value={3}>3</option>
+            <option value={4}>4</option>
+            <option value={5}>5</option>
+            <option value={6}>6</option>
+            <option value={7}>7</option>
+            <option value={8}>8</option>
+            <option value={9}>9</option>
+            <option value={10}>10</option>
+            <option value={11}>11</option>
+            <option value={12}>12</option>
+          </select>
+          <h4 style={{margin: '9px'}}>The Top 200</h4>
+        </div>
         <DragDropContext onDragEnd={onDragEnd}>
-          <Column players={top200} droppableId={'top200'}/>
+          <Column players={top200} droppableId={'top200'} pick={pick}/>
         </DragDropContext>
       </div>
     </div>

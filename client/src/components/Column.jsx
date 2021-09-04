@@ -20,7 +20,7 @@ const Headers = styled.h4`
   width: 40vw;
 `;
 
-const Column = ({players, droppableId}) => {
+const Column = ({players, droppableId, pick}) => {
   return (
     <div style={{display: 'flex', flexDirection: 'column'}}>
       {droppableId === 'top200'
@@ -53,7 +53,7 @@ const Column = ({players, droppableId}) => {
               ref={provided.innerRef}
             >
               {players.map((player, index) =>
-                <Player key={player.id} player={player} index={index} droppableId={droppableId}/>)}
+                <Player key={player.id} player={player} index={index} droppableId={droppableId} pick={pick} />)}
               {provided.placeholder}
             </PlayerList>
           )}
