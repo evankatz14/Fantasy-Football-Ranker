@@ -45,5 +45,13 @@
 }
 
 .blue {
-  background-color: lightseagreen;
+  color: rgb(6, 156, 250);
+  font-weight: bold;
+  font-style: italic;
+  font-size: large;
+}
+
+.drafted {
+  background-color: red;
+  text-decoration: line-through;
 }

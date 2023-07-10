@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import './App.css';
 import axios from 'axios';
 import _ from 'underscore';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import Column from './Column';
 
@@ -24,6 +24,8 @@ const Title = styled.div`
   border-radius: 2px;
 `;
 
+const server = 'http://localhost:3001'
+
 function App() {
   const [rbs, setRbs] = useState([]);
   const [wrs, setWrs] = useState([]);
@@ -35,54 +37,53 @@ function App() {
 
 
   useEffect(() => {
-    axios.get('http://localhost:3001/rbs')
-      .then(res => {
-        const rbsWithRanks = res.data.map((rb, index) => {
-          return {...rb, position_rank: index + 1};
-        })
-        setRbs(rbsWithRanks);
-      })
+    getPositionPlayers('rbs');
+    getPositionPlayers('wrs');
+    getPositionPlayers('tes');
+    getPositionPlayers('qbs');
 
     axios.get('http://localhost:3001/all')
       .then(res => {
         const allWithRanks = res.data.map((player, index) => {
-          return {...player, overall_rank: index + 1};
+          return {...player, overall_rank: index + 1, drafted: false};
         })
         setTop200(allWithRanks);
         axios.put('http://localhost:3001/all', top200);
       })
   }, []);
 
+  const getPositionPlayers = (curPos) => {
+    axios.get(`${server}/${curPos}`)
+      .then(res => {
+        const playersWithRanks = res.data.map((player, index) => {
+          return {...player, position_rank: index + 1, drafted: false}
+        })
+        setPositionPlayers(playersWithRanks, curPos);
+      })
+  }
+
   const setPositionPlayers = (players, curPos) => {
     curPos === 'rbs' ? setRbs(players) : curPos === 'wrs' ? setWrs(players) : curPos === 'qbs' ? setQbs(players) : curPos === 'tes' ? setTes(players) : setTop200(players);
   }
 
-  const promiseMemoize = (fn) => {
-    let cache = {}
-    return (...args) => {
-      let strX = JSON.stringify(args);
-      return strX in cache ? cache[strX]
-        : (cache[strX] = fn(...args).catch((x) => {
-            delete cache[strX];
-            return x;
-          }))
-    }
-  }
-
-  const originalMakeCall = (url, options) => {
-    return axios.get(url, options);
-  }
-
-  const makeCall = promiseMemoize(originalMakeCall);
-
   const handleChangeTab = async (curPos) => {
-      const {data} = await makeCall(`http://localhost:3001/${curPos}`);
-      const playersWithRanks = data.map((player, index) => {
-        return {...player, position_rank: index + 1};
-      })
-      setPositionPlayers(playersWithRanks, curPos);
-      setPosition(curPos);
+    setPosition(curPos);
+  }
+
+  const handleDraftPlayer = (index, name, curPos) => {
+    const newTop200 = [...top200];
+    newTop200[index].drafted = !newTop200[index].drafted;
+    setTop200(newTop200);
+
+    const newPlayers = curPos === 'rbs' ? [...rbs] : curPos === 'wrs' ? [...wrs] : curPos === 'qbs' ? [...qbs] : [...tes];
+    for (let i = 0; i < newPlayers.length; i++) {
+      if (newPlayers[i].name === name) {
+        newPlayers[i].drafted = !newPlayers[i].drafted;
+        return;
+      }
     }
+    setPositionPlayers(newPlayers, curPos);
+  }
 
   const onDragEnd = async (result) => {
     console.log(result)
@@ -101,12 +102,6 @@ function App() {
       if (destination && destination.droppableId === source.droppableId && destination.index === source.index) {
         return;
       }
-      // if (destination.droppableId === 'remove') {
-      //   newPlayers[source.index].position_rank = null;
-
-      //   displayPlayers.splice(source.index, 1);
-      //   setPositionPlayers(displayPlayers, source.droppableId);
-      // } else
       let temp = newPlayers[source.index];
       newPlayers.splice(source.index, 1);
       newPlayers.splice(destination.index, 0, temp);
@@ -139,20 +134,7 @@ function App() {
           <Title className={position === 'tes' && "selected"} onClick={() => handleChangeTab('tes')}>TEs</Title>
         </div>
         <DragDropContext onDragEnd={onDragEnd}>
-          <Column players={position === 'rbs' ? rbs : position === 'wrs' ? wrs : position === 'qbs' ? qbs : tes} droppableId={position}/>
-          {/* <Container>
-            <Droppable droppableId={'remove'}>
-              {provided => (
-                <Delete
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                >
-                  Remove Player
-                  {provided.placeholder}
-                </Delete>
-              )}
-            </Droppable>
-          </Container> */}
+          <Column players={position === 'rbs' ? rbs : position === 'wrs' ? wrs : position === 'qbs' ? qbs : tes} droppableId={position} />
         </DragDropContext>
       </div>
       <div style={{display: 'flex', flexDirection: 'column'}}>
@@ -174,7 +156,7 @@ function App() {
           <h4 style={{margin: '9px'}}>The Top 200</h4>
         </div>
         <DragDropContext onDragEnd={onDragEnd}>
-          <Column players={top200} droppableId={'top200'} pick={pick}/>
+          <Column players={top200} droppableId={'top200'} pick={pick} draftPlayer={handleDraftPlayer}/>
         </DragDropContext>
       </div>
     </div>

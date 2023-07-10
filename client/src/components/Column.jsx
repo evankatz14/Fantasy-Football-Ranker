@@ -20,12 +20,13 @@ const Headers = styled.h4`
   width: 40vw;
 `;
 
-const Column = ({players, droppableId, pick}) => {
+const Column = ({players, droppableId, pick, draftPlayer}) => {
   return (
     <div style={{display: 'flex', flexDirection: 'column'}}>
       {droppableId === 'top200'
       ? (
-        <Headers style={{display: 'grid', gridTemplateColumns: '[rank] 1fr [pos] 1fr [name] 3fr [team] 2fr [bye] 1fr [adp] 1fr [diff] 1fr [end]'}}>
+        <Headers style={{display: 'grid', gridTemplateColumns: '[draft] 1fr [rank] 1fr [pos] 1fr [name] 3fr [team] 2fr [bye] 1fr [adp] 1fr [diff] 1fr [end]'}}>
+          <div>Draft</div>
           <div>Rank</div>
           <div>Pos</div>
           <div>Name</div>
@@ -53,7 +54,13 @@ const Column = ({players, droppableId, pick}) => {
               ref={provided.innerRef}
             >
               {players.map((player, index) =>
-                <Player key={player.id} player={player} index={index} droppableId={droppableId} pick={pick} />)}
+                <>
+                  {/* {droppableId === 'top200' && (
+                    <button onClick={() => draftPlayer(index, player.name)}>X</button>
+                  )} */}
+                  <Player key={player.id} player={player} index={index} droppableId={droppableId} pick={pick} draftPlayer={draftPlayer} />
+                </>
+              )}
               {provided.placeholder}
             </PlayerList>
           )}
